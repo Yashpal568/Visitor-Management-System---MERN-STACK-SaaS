@@ -4,7 +4,7 @@ const router = express.Router();
 const authCtrl = require("../controllers/auth.controller");
 const passwordCtrl = require("../controllers/auth.password.controller");
 const auth = require("../middleware/auth");
-const {getMyProfile} = require ("../controllers/auth.controller")
+const { getMyProfile } = require("../controllers/auth.controller")
 
 router.post("/login", authCtrl.login);
 router.post("/logout", auth, authCtrl.logout);
@@ -17,5 +17,11 @@ router.get(
   "/me",
   auth,
   getMyProfile
+);
+
+router.put(
+  "/me",
+  auth,
+  authCtrl.updateMyProfile
 );
 module.exports = router;

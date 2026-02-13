@@ -8,6 +8,7 @@ const role = require("../middleware/role");
 /* Profile */
 router.get("/profile", auth, role("SuperAdmin"), superCtrl.getProfile);
 router.put("/profile", auth, role("SuperAdmin"), superCtrl.updateProfile);
+router.get("/dashboard/stats", auth, role("SuperAdmin"), superCtrl.getDashboardStats);
 
 /* Plans */
 router.post("/plans", auth, role("SuperAdmin"), superCtrl.createPlan);

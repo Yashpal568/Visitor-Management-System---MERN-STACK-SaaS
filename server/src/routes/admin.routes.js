@@ -8,6 +8,7 @@ const companyActive = require("../middleware/companyActive");
 const subscriptionActive = require("../middleware/subscriptionActive");
 
 router.post("/create-employee", auth, subscriptionActive, companyActive, role("Admin"), adminCtrl.createEmployee);
+router.get("/dashboard/stats", auth, role("Admin"), adminCtrl.getDashboardStats);
 
 router.get("/employees", auth, role("Admin"), adminCtrl.getEmployees);
 

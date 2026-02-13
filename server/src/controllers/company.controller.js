@@ -42,7 +42,7 @@ exports.createCompany = async (req, res, next) => {
       email: adminEmail,
       phone: adminPhone,
       role: "Admin",
-      password: await bcrypt.hash(adminPassword, 12),
+      password: adminPassword, // Let pre-save hook hash it
       isActive: true,
     });
 

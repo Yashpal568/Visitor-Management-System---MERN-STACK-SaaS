@@ -21,7 +21,7 @@ router.get(
 router.patch(
   "/:visitorId/action",
   auth,
-  role("Staff"),
+  role("Staff", "Security"),
   visitorCtrl.updateVisitorStatus
 );
 

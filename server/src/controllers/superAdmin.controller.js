@@ -12,6 +12,35 @@ exports.getProfile = async (req, res) => {
   res.json(user);
 };
 
+/* ======================
+   DASHBOARD STATS
+====================== */
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const totalCompanies = await Company.countDocuments();
+
+    // Revenue (Mock calculation for now, or aggregation from Payments)
+    const totalRevenue = await require("../models/Payment").aggregate([
+      { $match: { status: "success" } },
+      { $group: { _id: null, total: { $sum: "$amount" } } }
+    ]);
+
+    const activeSubscriptions = await require("../models/Subscription").countDocuments({ status: "active" });
+    const expiredSubscriptions = await require("../models/Subscription").countDocuments({ status: "expired" });
+    const pendingPayments = await require("../models/Payment").countDocuments({ status: "pending" });
+
+    res.json({
+      totalCompanies,
+      revenue: totalRevenue[0]?.total || 0,
+      activeSubscriptions,
+      expiredSubscriptions,
+      pendingPayments
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.updateProfile = async (req, res) => {
   const updates = req.body;
 

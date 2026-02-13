@@ -104,21 +104,19 @@ exports.updateVisitorStatus = async (req, res, next) => {
     const { visitorId } = req.params;
     const { action } = req.body;
 
-    if (!["APPROVED", "REJECTED"].includes(action)) {
+    const allowedActions = ["APPROVED", "REJECTED", "CHECKED_IN", "CHECKED_OUT"];
+    if (!allowedActions.includes(action)) {
       return res.status(400).json({
         message: "Invalid action"
       });
     }
 
-    const visitor = await Visitor.findOne({
-      _id: visitorId,
-      hrId: req.user.userId,
-      status: "PENDING"
-    });
+    // Find visitor without role restrictions first (we check role logic below)
+    const visitor = await Visitor.findById(visitorId);
 
     if (!visitor) {
       return res.status(404).json({
-        message: "Visitor not found or already processed"
+        message: "Visitor not found"
       });
     }
 
@@ -130,29 +128,74 @@ exports.updateVisitorStatus = async (req, res, next) => {
       });
     }
 
-    // 2️⃣ Update visitor status
+    // 2️⃣ Role-based Logic
+    const userRole = req.user.role; // "Staff" or "Security"
+
+    // HR Logic (Approve/Reject)
+    if (["APPROVED", "REJECTED"].includes(action)) {
+      if (userRole !== "Staff") {
+        return res.status(403).json({ message: "Only HR can approve/reject visitors" });
+      }
+      if (visitor.status !== "PENDING") {
+        return res.status(400).json({ message: "Visitor is not in PENDING state" });
+      }
+    }
+
+    // Security Logic (Check-In)
+    if (action === "CHECKED_IN") {
+      if (userRole !== "Security") {
+        return res.status(403).json({ message: "Only Security can check-in visitors" });
+      }
+      if (visitor.status !== "APPROVED") {
+        return res.status(400).json({ message: "Visitor must be APPROVED before check-in" });
+      }
+      visitor.checkInAt = new Date();
+    }
+
+    // Security Logic (Check-Out)
+    if (action === "CHECKED_OUT") {
+      if (userRole !== "Security") {
+        return res.status(403).json({ message: "Only Security can check-out visitors" });
+      }
+      if (visitor.status !== "CHECKED_IN") {
+        return res.status(400).json({ message: "Visitor must be CHECKED_IN before check-out" });
+      }
+      visitor.checkOutAt = new Date();
+    }
+
+    // 3️⃣ Update visitor status
     visitor.status = action;
     await visitor.save();
 
-    // 3️⃣ Notify security users
-    const securityUsers = await User.find({
-      companyId: visitor.companyId,
-      role: "Security"
-    });
+    // 4️⃣ Notify relevant parties
+    // If HR Approved/Rejected -> Notify Security (Wait, usually Security notified when APPROVED)
+    // If Security Check-In -> Notify HR (Visitor Arrived)
 
-    for (const sec of securityUsers) {
+    if (action === "APPROVED") {
+      // Notify Security
+      // (Implementation kept simple: just create notif for all security)
+      const securityUsers = await User.find({ companyId: visitor.companyId, role: "Security" });
+      for (const sec of securityUsers) {
+        await createNotification({
+          userId: sec._id,
+          companyId: visitor.companyId,
+          type: "VISITOR_APPROVED",
+          message: `Visitor ${visitor.name} Approved. Expect arrival.`
+        });
+      }
+    } else if (action === "CHECKED_IN") {
+      // Notify HR (Host)
       await createNotification({
-        userId: sec._id,
+        userId: visitor.hrId,
         companyId: visitor.companyId,
-        type: action === "APPROVED"
-          ? "VISITOR_APPROVED"
-          : "VISITOR_REJECTED",
-        message: `Visitor ${visitor.name} was ${action.toLowerCase()}`
+        type: "VISITOR_ARRIVED",
+        message: `Visitor ${visitor.name} has Checked In.`
       });
     }
 
     res.json({
-      message: `Visitor ${action.toLowerCase()} successfully`
+      message: `Visitor status updated to ${action}`,
+      visitor
     });
   } catch (err) {
     next(err);

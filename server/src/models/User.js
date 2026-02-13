@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
@@ -37,5 +38,15 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Pre-save hook to hash password
+// Using async/await without `next` for modern Mongoose
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+
+  console.log("HASHING PASSWORD for", this.email);
+  this.password = await bcrypt.hash(this.password, 10);
+  console.log("PASSWORD HASHED");
+});
 
 module.exports = mongoose.model("User", userSchema);

@@ -74,9 +74,9 @@ exports.setPassword = async (req, res, next) => {
       });
     }
 
-    // 🔐 HASH PASSWORD (same logic login expects)
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    // 🔐 HASH PASSWORD (handled by pre-save hook)
+    // const salt = await bcrypt.genSalt(10);
+    user.password = newPassword;
 
     user.isFirstLogin = false;
     await user.save();
@@ -107,6 +107,36 @@ exports.getMyProfile = async (req, res, next) => {
       designation: user.designation,
       isActive: user.isActive,
       createdAt: user.createdAt
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateMyProfile = async (req, res, next) => {
+  try {
+    const updates = req.body;
+    const allowedUpdates = ["name", "phone", "department", "designation"]; // Whitelist fields
+    const actualUpdates = {};
+
+    Object.keys(updates).forEach((key) => {
+      if (allowedUpdates.includes(key)) {
+        actualUpdates[key] = updates[key];
+      }
+    });
+
+    const user = await User.findByIdAndUpdate(req.user.userId, actualUpdates, {
+      new: true,
+      runValidators: true
+    }).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "Profile updated successfully",
+      user
     });
   } catch (err) {
     next(err);

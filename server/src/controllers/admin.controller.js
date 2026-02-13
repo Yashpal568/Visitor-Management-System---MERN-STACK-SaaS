@@ -1,6 +1,47 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { checkEmployeeLimit } = require("../services/employeeLimit.service");
+const Visitor = require("../models/Visitor");
+const Subscription = require("../models/Subscription");
+
+exports.getDashboardStats = async (req, res, next) => {
+  try {
+    const companyId = req.user.companyId;
+
+    // 1. Visitor Stats
+    const totalVisitors = await Visitor.countDocuments({ companyId });
+    const activeVisitors = await Visitor.countDocuments({ companyId, status: "CHECKED_IN" });
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayVisitors = await Visitor.countDocuments({
+      companyId,
+      createdAt: { $gte: todayStart }
+    });
+
+    // 2. Employee Stats
+    const totalEmployees = await User.countDocuments({ companyId, role: { $ne: "Admin" } });
+
+    // 3. Subscription Info
+    const subscription = await Subscription.findOne({ companyId });
+    let daysRemaining = 0;
+    if (subscription && subscription.endDate) {
+      const diff = new Date(subscription.endDate) - new Date();
+      daysRemaining = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+
+    res.json({
+      totalVisitors,
+      activeVisitors,
+      todayVisitors,
+      totalEmployees,
+      subscriptionStatus: subscription ? subscription.status : "none",
+      daysRemaining: daysRemaining > 0 ? daysRemaining : 0
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.createEmployee = async (req, res, next) => {
   try {
