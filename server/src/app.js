@@ -18,12 +18,12 @@ app.use(express.json({ limit: "10kb" }));
 app.use(hpp());
 
 // Rate Limiting
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 300
-  })
-);
+const { globalLimiter, authLimiter, paymentLimiter } = require("./middleware/rateLimiter");
+
+// Rate Limiting
+app.use(globalLimiter); // Apply to all requests
+app.use("/auth", authLimiter); // Apply stricter limit to auth routes
+app.use("/payment", paymentLimiter); // Apply strict limit to payment routes
 
 //Routes
 app.use("/auth", require("./routes/auth.routes"));
