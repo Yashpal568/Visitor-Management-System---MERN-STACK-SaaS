@@ -30,13 +30,16 @@ exports.createOrder = async (req, res, next) => {
 
     let order;
     try {
+      if (!razorpay) {
+        throw new Error("Razorpay not initialized");
+      }
       order = await razorpay.orders.create({
         amount: amount * 100,
         currency: "INR",
         receipt: `receipt_${Date.now()}`
       });
     } catch (rpError) {
-      console.warn("⚠️ Razorpay Failed (using dummy keys?). Returning MOCK order.", rpError.message);
+      console.warn("⚠️ Razorpay Failed (No keys or Error). Returning MOCK order.", rpError.message);
       order = { id: `order_mock_${Date.now()}` };
     }
 
