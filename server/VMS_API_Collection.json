@@ -70,7 +70,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"New Name\",\n    \"phone\": \"9876543210\"\n}",
+							"raw": "{\n    \"name\": \"New Name\",\n    \"phone\": \"9876543210\",\n    \"department\": \"Engineering\",\n    \"designation\": \"Manager\"\n}",
 							"options": {
 								"raw": { "language": "json" }
 							}
@@ -90,7 +90,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@example.com\",\n    \"newPassword\": \"newpass\"\n}",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"newPassword\": \"newpass123\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
@@ -100,27 +100,48 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Super Admin",
-			"item": [
+				},
 				{
-					"name": "Dashboard Stats",
+					"name": "Forgot Password",
 					"request": {
-						"method": "GET",
-						"header": [
-							{ "key": "Authorization", "value": "Bearer {{token}}" }
-						],
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
 						"url": {
-							"raw": "{{url}}/api/super-admin/dashboard/stats",
+							"raw": "{{url}}/api/auth/forgot-password",
 							"host": ["{{url}}"],
-							"path": ["api", "super-admin", "dashboard", "stats"]
+							"path": ["api", "auth", "forgot-password"]
 						}
 					},
 					"response": []
 				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"RESET_TOKEN\",\n    \"newPassword\": \"newpassword123\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/auth/reset-password",
+							"host": ["{{url}}"],
+							"path": ["api", "auth", "reset-password"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Company",
+			"item": [
 				{
 					"name": "Create Company",
 					"request": {
@@ -130,7 +151,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"companyName\": \"Tech Corp\",\n    \"companyEmail\": \"info@tech.com\",\n    \"adminEmail\": \"admin@tech.com\",\n    \"adminPassword\": \"password123\"\n}",
+							"raw": "{\n    \"companyName\": \"Tech Corp\",\n    \"companyEmail\": \"info@tech.com\",\n    \"companyPhone\": \"1234567890\",\n    \"address\": \"123 Tech Street\",\n    \"industry\": \"IT\",\n    \"adminName\": \"Admin User\",\n    \"adminEmail\": \"admin@tech.com\",\n    \"adminPhone\": \"9876543210\",\n    \"adminPassword\": \"password123\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
@@ -142,56 +163,21 @@
 					"response": []
 				},
 				{
-					"name": "Get All Companies",
+					"name": "Update Company",
 					"request": {
-						"method": "GET",
-						"header": [
-							{ "key": "Authorization", "value": "Bearer {{token}}" }
-						],
-						"url": {
-							"raw": "{{url}}/api/super-admin/companies",
-							"host": ["{{url}}"],
-							"path": ["api", "super-admin", "companies"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Plan",
-					"request": {
-						"method": "POST",
+						"method": "PUT",
 						"header": [
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Gold\",\n    \"priceMonthly\": 100,\n    \"employeeLimit\": 10\n}",
+							"raw": "{\n    \"name\": \"Tech Corp Updated\",\n    \"industry\": \"Software\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{url}}/api/super-admin/plans",
+							"raw": "{{url}}/api/company/update",
 							"host": ["{{url}}"],
-							"path": ["api", "super-admin", "plans"]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Company Admin",
-			"item": [
-				{
-					"name": "Dashboard Stats",
-					"request": {
-						"method": "GET",
-						"header": [
-							{ "key": "Authorization", "value": "Bearer {{token}}" }
-						],
-						"url": {
-							"raw": "{{url}}/api/admin/dashboard/stats",
-							"host": ["{{url}}"],
-							"path": ["api", "admin", "dashboard", "stats"]
+							"path": ["api", "company", "update"]
 						}
 					},
 					"response": []
@@ -212,6 +198,206 @@
 					"response": []
 				},
 				{
+					"name": "Get HR List (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/company/:companyId/hr-list",
+							"host": ["{{url}}"],
+							"path": ["api", "company", ":companyId", "hr-list"],
+							"variable": [
+								{ "key": "companyId", "value": "COMPANY_ID" }
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Super Admin",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/super-admin/profile",
+							"host": ["{{url}}"],
+							"path": ["api", "super-admin", "profile"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Super Admin Name\",\n    \"email\": \"super@admin.com\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/super-admin/profile",
+							"host": ["{{url}}"],
+							"path": ["api", "super-admin", "profile"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/super-admin/dashboard/stats",
+							"host": ["{{url}}"],
+							"path": ["api", "super-admin", "dashboard", "stats"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Companies",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/super-admin/companies",
+							"host": ["{{url}}"],
+							"path": ["api", "super-admin", "companies"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Company Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/super-admin/companies/:id/status",
+							"host": ["{{url}}"],
+							"path": ["api", "super-admin", "companies", ":id", "status"],
+							"variable": [
+								{ "key": "id", "value": "COMPANY_ID" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Plans",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/super-admin/plans",
+							"host": ["{{url}}"],
+							"path": ["api", "super-admin", "plans"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Plan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Gold\",\n    \"priceMonthly\": 1000,\n    \"priceYearly\": 10000,\n    \"employeeLimit\": 50,\n    \"features\": [\"Feature 1\", \"Feature 2\"]\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/super-admin/plans",
+							"host": ["{{url}}"],
+							"path": ["api", "super-admin", "plans"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Plan",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Gold Updated\",\n    \"priceMonthly\": 1200\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/super-admin/plans/:id",
+							"host": ["{{url}}"],
+							"path": ["api", "super-admin", "plans", ":id"],
+							"variable": [
+								{ "key": "id", "value": "PLAN_ID" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Plan Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/super-admin/plans/:id/toggle",
+							"host": ["{{url}}"],
+							"path": ["api", "super-admin", "plans", ":id", "toggle"],
+							"variable": [
+								{ "key": "id", "value": "PLAN_ID" }
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin (Company)",
+			"item": [
+				{
+					"name": "Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/admin/dashboard/stats",
+							"host": ["{{url}}"],
+							"path": ["api", "admin", "dashboard", "stats"]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create Employee",
 					"request": {
 						"method": "POST",
@@ -220,7 +406,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"John HR\",\n    \"email\": \"hr@company.com\",\n    \"role\": \"Staff\"\n}",
+							"raw": "{\n    \"name\": \"John Staff\",\n    \"email\": \"staff@company.com\",\n    \"phone\": \"9876543210\",\n    \"role\": \"Staff\",\n    \"department\": \"IT\",\n    \"designation\": \"Developer\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
@@ -245,63 +431,44 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Payments",
-			"item": [
+				},
 				{
-					"name": "Submit Manual Payment",
+					"name": "Update Employee",
 					"request": {
-						"method": "POST",
+						"method": "PUT",
 						"header": [
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"planId\": \"PLAN_ID\",\n    \"billingCycle\": \"monthly\",\n    \"transactionId\": \"TXN_123\"\n}",
+							"raw": "{\n    \"name\": \"John Updated\",\n    \"department\": \"HR\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{url}}/api/payment/mark-paid",
+							"raw": "{{url}}/api/admin/employee/:employeeId",
 							"host": ["{{url}}"],
-							"path": ["api", "payment", "mark-paid"]
+							"path": ["api", "admin", "employee", ":employeeId"],
+							"variable": [
+								{ "key": "employeeId", "value": "EMP_ID" }
+							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get Pending Requests (Admin)",
+					"name": "Delete Employee",
 					"request": {
-						"method": "GET",
+						"method": "DELETE",
 						"header": [
 							{ "key": "Authorization", "value": "Bearer {{token}}" }
 						],
 						"url": {
-							"raw": "{{url}}/api/payment/pending-requests",
+							"raw": "{{url}}/api/admin/employee/:employeeId",
 							"host": ["{{url}}"],
-							"path": ["api", "payment", "pending-requests"]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Approve Payment (Admin)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{ "key": "Authorization", "value": "Bearer {{token}}" }
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"paymentId\": \"PAYMENT_ID\"\n}",
-							"options": { "raw": { "language": "json" } }
-						},
-						"url": {
-							"raw": "{{url}}/api/payment/approve-request",
-							"host": ["{{url}}"],
-							"path": ["api", "payment", "approve-request"]
+							"path": ["api", "admin", "employee", ":employeeId"],
+							"variable": [
+								{ "key": "employeeId", "value": "EMP_ID" }
+							]
 						}
 					},
 					"response": []
@@ -318,7 +485,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Visitor\",\n    \"phone\": \"1234567890\",\n    \"purpose\": \"Visit\",\n    \"hrId\": \"HR_ID\",\n    \"selfie\": \"base64string\"\n}",
+							"raw": "{\n    \"name\": \"Visitor Name\",\n    \"phone\": \"9876543210\",\n    \"email\": \"visitor@example.com\",\n    \"purpose\": \"Meeting\",\n    \"hrId\": \"HR_USER_ID\",\n    \"selfie\": \"base64_string\"\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
@@ -348,7 +515,7 @@
 					"response": []
 				},
 				{
-					"name": "Action (Approve/Reject/CheckIn)",
+					"name": "Update Visitor Status (Action)",
 					"request": {
 						"method": "PATCH",
 						"header": [
@@ -371,6 +538,37 @@
 					"response": []
 				},
 				{
+					"name": "Get Visitor Status (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/visitor/status/:visitorId",
+							"host": ["{{url}}"],
+							"path": ["api", "visitor", "status", ":visitorId"],
+							"variable": [
+								{ "key": "visitorId", "value": "VISITOR_ID" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Visitor History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/visitor/history",
+							"host": ["{{url}}"],
+							"path": ["api", "visitor", "history"]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Visitor Analytics",
 					"request": {
 						"method": "GET",
@@ -381,6 +579,242 @@
 							"raw": "{{url}}/api/visitor/analytics",
 							"host": ["{{url}}"],
 							"path": ["api", "visitor", "analytics"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Create Order (Razorpay)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": \"PLAN_ID\",\n    \"billingCycle\": \"monthly\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/payment/create-order",
+							"host": ["{{url}}"],
+							"path": ["api", "payment", "create-order"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate Plan (DUMMY)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": \"PLAN_ID\",\n    \"billingCycle\": \"monthly\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/payment/activate",
+							"host": ["{{url}}"],
+							"path": ["api", "payment", "activate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Manual UPI QR",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": \"PLAN_ID\",\n    \"billingCycle\": \"yearly\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/payment/manual-qr",
+							"host": ["{{url}}"],
+							"path": ["api", "payment", "manual-qr"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Manual Payment (Mark Paid)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": \"PLAN_ID\",\n    \"billingCycle\": \"monthly\",\n    \"transactionId\": \"TXN_12345\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/payment/mark-paid",
+							"host": ["{{url}}"],
+							"path": ["api", "payment", "mark-paid"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Requests (Admin/SuperAdmin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/payment/pending-requests",
+							"host": ["{{url}}"],
+							"path": ["api", "payment", "pending-requests"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Request (Admin/SuperAdmin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"paymentId\": \"PAYMENT_ID\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/payment/approve-request",
+							"host": ["{{url}}"],
+							"path": ["api", "payment", "approve-request"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Request (Admin/SuperAdmin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"paymentId\": \"PAYMENT_ID\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/payment/reject-request",
+							"host": ["{{url}}"],
+							"path": ["api", "payment", "reject-request"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Security Portal",
+			"item": [
+				{
+					"name": "Get Approved Visitors",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/security/approved",
+							"host": ["{{url}}"],
+							"path": ["api", "security", "approved"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check-In (Security)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/security/check-in/:visitorId",
+							"host": ["{{url}}"],
+							"path": ["api", "security", "check-in", ":visitorId"],
+							"variable": [
+								{ "key": "visitorId", "value": "VISITOR_ID" }
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check-Out (Security)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/security/check-out/:visitorId",
+							"host": ["{{url}}"],
+							"path": ["api", "security", "check-out", ":visitorId"],
+							"variable": [
+								{ "key": "visitorId", "value": "VISITOR_ID" }
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subscription",
+			"item": [
+				{
+					"name": "Activate Subscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": \"PLAN_ID\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{url}}/api/subscription/activate",
+							"host": ["{{url}}"],
+							"path": ["api", "subscription", "activate"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Subscription Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{url}}/api/subscription/me",
+							"host": ["{{url}}"],
+							"path": ["api", "subscription", "me"]
 						}
 					},
 					"response": []

@@ -30,3 +30,7 @@ coverage/
 *.njsproj
 *.sln
 *.sw?
+
+# Postman
+VMS_API_Collection.json
+VMS_API_Collection.zip
