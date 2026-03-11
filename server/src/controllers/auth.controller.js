@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const BlacklistedToken = require("../models/BlacklistedToken");
+const BlackListedToken = require("../models/BlackListedToken");
 
 exports.login = async (req, res, next) => {
   try {
